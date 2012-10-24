@@ -1,0 +1,7 @@
+{
+    zone            => 'YOUR ZONE NAME',
+    ns              => 'YOUR NAME SERVER',
+    ttl             => 300,
+    consumer_key    => 'YOUR CONSUMER KEY',
+    consumer_secret => 'YOUR CONSUMER SECRET',
+}
