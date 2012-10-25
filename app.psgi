@@ -5,10 +5,10 @@ use File::Spec;
 use File::Basename;
 use lib File::Spec->catdir(dirname(__FILE__), 'lib');
 
-use Haruna;
+use Haruna::Server;
 use Plack::Builder;
 
-my $h = Haruna->new;
+my $h = Haruna::Server->new;
 my $app = sub {
     $h->run(shift); 
 };
