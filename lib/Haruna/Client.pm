@@ -2,20 +2,19 @@ package Haruna::Client;
 use strict;
 use warnings;
 
-use Haruna::Util;
 use JSON;
 use OAuth::Lite::Consumer;
 use LWP::UserAgent;
 
 sub new {
-    my $self = bless {}, shift;
-    $self->{config} = Haruna::Util->load_config('config.pl');
-
+    my ($class, $config) = @_;
+    my $self = bless {}, $class;
+    $self->{config} = $config;
     return $self;
 }
 
 sub request {
-    my ( $self, $url, $host, $ipaddr ) = @_;
+    my ($self, $url, $host, $ipaddr) = @_;
 
     my $config = $self->{config};
 
@@ -25,7 +24,7 @@ sub request {
     );
 
     my %params = ();
-    $params{host}   = $host;
+    $params{host} = $host;
     $params{ipaddr} = $ipaddr if $ipaddr;
 
     my $req = $consumer->gen_oauth_request(

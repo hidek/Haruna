@@ -2,21 +2,22 @@ package Haruna::Server;
 use strict;
 use warnings;
 
-use Haruna::Util;
 use Plack::Request;
 use Log::Minimal;
 use Net::DNS;
 use JSON;
 
 sub new {
-    my $self = bless {}, shift;
-    $self->{config} = Haruna::Util->load_config('config.pl');
+    my ($class, $config) = @_;
+
+    my $self = bless {}, $class;
+    $self->{config} = $config;
 
     return $self;
 }
 
 sub run {
-    my ( $self, $env ) = @_;
+    my ($self, $env) = @_;
 
     my $req = Plack::Request->new($env);
 
@@ -27,18 +28,16 @@ sub run {
     my $host = $req->param("host");
 
     if ($host) {
-        my $update = $self->update_dns( $host, $ipaddr );
+        my $update = $self->update_dns($host, $ipaddr);
         if ($update) {
             infof("update fail: $update");
             $res->{error} = $update;
             $status = 400;
-        }
-        else {
+        } else {
             infof('update success');
             $status = 200;
         }
-    }
-    else {
+    } else {
         infof("update fail: invalid parameter");
         $res->{error} = 'invalid parameter';
         $status = 400;
@@ -49,14 +48,13 @@ sub run {
 
     my $json = JSON->new;
     return [
-        $status,
-        [ 'Content-Type' => 'application/json' ],
-        [ $json->encode($res) ]
+        $status, ['Content-Type' => 'application/json'],
+        [$json->encode($res)]
     ];
 }
 
 sub update_dns {
-    my ( $self, $host, $ipaddr ) = @_;
+    my ($self, $host, $ipaddr) = @_;
 
     my $zone = $self->{config}{zone};
     my $ns   = $self->{config}{ns};
@@ -67,16 +65,15 @@ sub update_dns {
 
     my $update = Net::DNS::Update->new($zone);
 
-    $update->push( update => rr_del("$host.$zone A") );
-    $update->push( update => rr_add("$host.$zone $ttl A $ipaddr") );
+    $update->push(update => rr_del("$host.$zone A"));
+    $update->push(update => rr_add("$host.$zone $ttl A $ipaddr"));
 
     my $reply = $res->send($update);
 
     if ($reply) {
         my $rcode = $reply->header->rcode;
         $rcode eq 'NOERROR' ? return : return "failed: $rcode";
-    }
-    else {
+    } else {
         return 'failed: ', $res->errorstring;
     }
 }

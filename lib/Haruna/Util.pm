@@ -10,10 +10,10 @@ sub load_config {
 
     my $fname  = File::Spec->catfile($file);
     my $config = do $fname;
-    croak ("$fname: $@") if $@;
-    croak ("$fname: $!") unless defined $config;
-    unless ( ref($config) eq 'HASH' ) {
-        croak ("$fname does not return HashRef.");
+    croak("$fname: $@") if $@;
+    croak("$fname: $!") unless defined $config;
+    unless (ref($config) eq 'HASH') {
+        croak("$fname does not return HashRef.");
     }
     return $config;
 }
